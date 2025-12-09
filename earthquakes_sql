@@ -1,0 +1,10 @@
+select count(eventid) as total_earthquakes
+from terremoti_italia_ingv;
+
+
+SELECT 
+    YEAR(time) AS year,
+    COUNT(*) AS num_events
+FROM terremoti_italia_ingv
+GROUP BY year
+ORDER BY year;

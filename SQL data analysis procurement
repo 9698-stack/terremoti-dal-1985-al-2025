@@ -1,0 +1,60 @@
+--- spesa fornitori
+
+SELECT
+    s.supplier_name,
+    SUM(p.quantity * p.unit_price) AS total_spend
+FROM purchase_orders p
+JOIN suppliers s 
+    ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_name
+ORDER BY total_spend DESC;
+
+--- spesa materiali
+
+SELECT
+    m.material_category,
+    SUM(p.quantity * p.unit_price) AS total_spend
+FROM purchase_orders p
+JOIN materials m 
+    ON p.material_id = m.material_id
+GROUP BY m.material_category
+ORDER BY total_spend DESC;
+
+---tot spend per month
+
+SELECT
+    YEAR(p.order_date) AS year,
+    MONTH(p.order_date) AS month,
+    SUM(p.quantity * p.unit_price) AS monthly_spend
+FROM purchase_orders p
+GROUP BY YEAR(p.order_date), MONTH(p.order_date)
+ORDER BY year, month;
+
+---- on time delivery
+
+SELECT
+    s.supplier_name,
+    ROUND(
+        100.0 * SUM(CASE 
+            WHEN d.delivery_date <= d.expected_date THEN 1 
+            ELSE 0 
+        END) / COUNT(*),
+    2) AS on_time_delivery_pct
+FROM deliveries d
+JOIN purchase_orders p 
+    ON d.order_id = p.order_id
+JOIN suppliers s 
+    ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_name
+ORDER BY on_time_delivery_pct DESC;
+
+---- fornitori
+
+SELECT
+    s.supplier_name,
+    COUNT(p.order_id) AS number_of_orders
+FROM purchase_orders p
+JOIN suppliers s 
+    ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_name
+ORDER BY number_of_orders DESC;
